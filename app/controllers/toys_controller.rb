@@ -7,21 +7,33 @@ class ToysController < ApplicationController
   end
 
   def create
-    toy = Toys.create(toy_params)
-    render json: toy, status: :created
+    begin
+      toy = Toy.create(toy_params)
+      render json: toy, status: :created
+    rescue StandardError => e
+      render json: { error: e.message }, status: :unprocessable_entity
+    end
   end
 
   def update
-    toy = Toy.find_by(id: params[:id])
-    toy.update(toy_params)
+    begin
+      toy = Toy.find_by(id: params[:id])
+      toy.update(likes: toy_params[:likes])
+      head :no_content
+    rescue StandardError => e
+      render json: { error: e.message }, status: :unprocessable_entity
+    end
   end
 
   def destroy
-    toy = Toy.find_by(id: params[:id])
-    toy.destroy
-    head :no_content
+    begin
+      toy = Toy.find_by(id: params[:id])
+      toy.destroy
+      head :no_content
+    rescue StandardError => e
+      render json: { error: e.message }, status: :unprocessable_entity
+    end
   end
-
   private
   
   def toy_params
